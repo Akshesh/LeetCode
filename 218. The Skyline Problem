@@ -1,0 +1,40 @@
+from sortedcontainers import SortedList
+class Solution(object):
+    def getSkyline(self, buildings):
+        """
+        :type buildings: List[List[int]]
+        :rtype: List[List[int]]
+        """
+        events = []
+        
+        for l,r,h in buildings:
+            events.append((l,0,-h))
+            events.append((r,1,h))
+        
+        events.sort()
+        ans = []
+        active_height = SortedList([0])
+        i = 0
+        n = len(events)
+        
+        while i<n: #O(n)
+            x,startorend,h = events[i]
+            
+            if startorend == 0:
+                #it means start of building
+                active_height.add(-h)     # O(logn)
+            else:
+                #it means eng of building
+                active_height.remove(h)   # O(logn)
+            
+            if not ans or ans[-1][1]!=active_height[-1]:
+                ans.append([x,active_height[-1]])
+            
+            i += 1
+        
+        return ans
+    # reference : https://www.youtube.com/watch?v=W2afZs9DYYA&ab_channel=HappyCoding
+    # we would have add (l,0,h) but if buildings are overlapping then it would fail
+    #for ex [[1,2,1],[1,2,2],[1,2,3]], building are overlapping and it will add height 1,2,3 in ans which is wrong. so we added -h so maximum height gets first while iterating
+    # Time Complexity : O(nlogn)
+    # Space Complexity : O(n)
